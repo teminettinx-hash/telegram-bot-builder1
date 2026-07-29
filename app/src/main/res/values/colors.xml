@@ -1,0 +1,7 @@
+<resources>
+    <color name="accent">#6C74B8</color>
+    <color name="accent_dark">#565EA0</color>
+    <color name="text_primary">#1D1D2B</color>
+    <color name="text_secondary">#6E6E82</color>
+    <color name="glass_stroke">#40FFFFFF</color>
+</resources>
