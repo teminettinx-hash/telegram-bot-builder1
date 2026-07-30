@@ -59,6 +59,18 @@ class SecureStore(context: Context) {
         get() = prefs.getBoolean(KEY_AI_ENABLED, false)
         set(value) = prefs.edit().putBoolean(KEY_AI_ENABLED, value).apply()
 
+    /** "STRICT" — only answers from fed reference info, refuses general knowledge.
+     *  "FREE" — can answer general knowledge AND fed reference info. Default FREE. */
+    var aiMode: String
+        get() = prefs.getString(KEY_AI_MODE, "FREE") ?: "FREE"
+        set(value) = prefs.edit().putString(KEY_AI_MODE, value).apply()
+
+    /** Last AI call failure, surfaced in AI Settings so failures during real Telegram
+     *  use aren't invisible — cleared automatically on the next successful call. */
+    var aiLastError: String?
+        get() = prefs.getString(KEY_AI_LAST_ERROR, null)
+        set(value) = prefs.edit().putString(KEY_AI_LAST_ERROR, value).apply()
+
     // --- Billing / plan entitlement ---
 
     /** Cached tier name ("FREE", "PRO", "MAX"). Source of truth is Play Billing;
@@ -113,6 +125,8 @@ class SecureStore(context: Context) {
         private const val KEY_AI_TEMP = "ai_temperature"
         private const val KEY_AI_MAX_TOKENS = "ai_max_tokens"
         private const val KEY_AI_ENABLED = "ai_enabled"
+        private const val KEY_AI_MODE = "ai_mode"
+        private const val KEY_AI_LAST_ERROR = "ai_last_error"
         private const val KEY_PLAN_TIER = "plan_tier"
         private const val KEY_USAGE_MONTH = "usage_month"
         private const val KEY_MESSAGES_THIS_MONTH = "messages_this_month"

@@ -1,5 +1,6 @@
 package com.botbuilder.app.ui.ai
 
+import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.ViewGroup
@@ -8,21 +9,27 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.botbuilder.app.R
+import androidx.lifecycle.lifecycleScope
 import com.botbuilder.app.data.local.SecureStore
+import com.botbuilder.app.data.remote.AiConfig
+import com.botbuilder.app.data.remote.AiProviderRouter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.launch
 
 private const val ACCENT = 0xFF6C74B8.toInt()
 private const val TEXT_PRIMARY = 0xFF1D1D2B.toInt()
 private const val TEXT_SECONDARY = 0xFF6E6E82.toInt()
+private const val ERROR_RED = 0xFFBA1A1A.toInt()
+private const val SUCCESS_GREEN = 0xFF2E7D32.toInt()
 
 class AiSettingsActivity : AppCompatActivity() {
 
     private lateinit var secureStore: SecureStore
+    private val aiProvider = AiProviderRouter()
 
     private lateinit var aiSwitch: MaterialSwitch
     private lateinit var providerDropdown: MaterialAutoCompleteTextView
@@ -32,6 +39,11 @@ class AiSettingsActivity : AppCompatActivity() {
     private lateinit var tempInput: TextInputEditText
     private lateinit var maxTokensInput: TextInputEditText
     private lateinit var systemPromptInput: TextInputEditText
+    private lateinit var strictButton: MaterialButton
+    private lateinit var freeButton: MaterialButton
+    private lateinit var testStatusText: TextView
+
+    private var selectedMode = "FREE"
 
     private val providers = listOf("Gemini (has a free tier)", "OpenAI", "Anthropic", "OpenRouter", "Custom endpoint")
     private val providerKeys = listOf("gemini", "openai", "anthropic", "openrouter", "custom")
@@ -39,6 +51,7 @@ class AiSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         secureStore = SecureStore(applicationContext)
+        selectedMode = secureStore.aiMode
 
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -73,7 +86,7 @@ class AiSettingsActivity : AppCompatActivity() {
         }
         aiSwitch = MaterialSwitch(this).apply {
             isChecked = secureStore.aiEnabled
-            thumbTintList = android.content.res.ColorStateList.valueOf(ACCENT)
+            thumbTintList = ColorStateList.valueOf(ACCENT)
         }
         switchRow.addView(switchLabel)
         switchRow.addView(aiSwitch)
@@ -82,6 +95,57 @@ class AiSettingsActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(padding, 0, padding, padding)
         }
+
+        // --- Strict / Free mode selector ---
+        val modeLabel = TextView(this).apply {
+            text = "Answer mode"
+            textSize = 15f
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(TEXT_PRIMARY)
+            setPadding(0, 0, 0, dp(6))
+        }
+        formContainer.addView(modeLabel)
+
+        val modeRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        strictButton = MaterialButton(this).apply {
+            text = "Strict"
+            isAllCaps = false
+            textSize = 14f
+            cornerRadius = dp(14)
+        }
+        freeButton = MaterialButton(this).apply {
+            text = "Free"
+            isAllCaps = false
+            textSize = 14f
+            cornerRadius = dp(14)
+        }
+        modeRow.addView(strictButton, LinearLayout.LayoutParams(0, dp(46), 1f).also { it.marginEnd = dp(6) })
+        modeRow.addView(freeButton, LinearLayout.LayoutParams(0, dp(46), 1f).also { it.marginStart = dp(6) })
+        formContainer.addView(modeRow)
+
+        val modeExplainer = TextView(this).apply {
+            textSize = 12f
+            setTextColor(TEXT_SECONDARY)
+            setPadding(0, dp(8), 0, dp(18))
+        }
+        formContainer.addView(modeExplainer)
+
+        fun refreshModeUi() {
+            val strictOn = selectedMode == "STRICT"
+            strictButton.backgroundTintList = ColorStateList.valueOf(if (strictOn) ACCENT else 0xFFE4E1E8.toInt())
+            strictButton.setTextColor(if (strictOn) 0xFFFFFFFF.toInt() else TEXT_PRIMARY)
+            freeButton.backgroundTintList = ColorStateList.valueOf(if (!strictOn) ACCENT else 0xFFE4E1E8.toInt())
+            freeButton.setTextColor(if (!strictOn) 0xFFFFFFFF.toInt() else TEXT_PRIMARY)
+            modeExplainer.text = if (strictOn)
+                "Strict: only answers using the information you've given it (Auto Replies + system prompt below). It won't answer general questions outside that — e.g. it won't explain what water is unless you've told it to."
+            else
+                "Free: can answer general questions (\"what is water?\") using its own knowledge, and will also use your saved information when a question matches it."
+        }
+
+        // reassign click listeners now that refreshModeUi is in scope
+        strictButton.setOnClickListener { selectedMode = "STRICT"; refreshModeUi() }
+        freeButton.setOnClickListener { selectedMode = "FREE"; refreshModeUi() }
+        refreshModeUi()
 
         val (providerTil, providerField) = dropdownField("AI provider")
         providerDropdown = providerField
@@ -127,7 +191,7 @@ class AiSettingsActivity : AppCompatActivity() {
         formContainer.addView(promptTil)
 
         val note = TextView(this).apply {
-            text = "Your saved Auto Replies (labels + answers) are automatically added to this prompt when AI is used, so pricing and other saved info stays accurate."
+            text = "Your saved Auto Replies (labels + answers) are automatically added as reference info when AI is used, so pricing and other saved info stays accurate."
             textSize = 12f
             setTextColor(TEXT_SECONDARY)
             setPadding(0, dp(4), 0, dp(4))
@@ -139,10 +203,33 @@ class AiSettingsActivity : AppCompatActivity() {
             isAllCaps = false
             textSize = 15f
             cornerRadius = dp(16)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(ACCENT)
+            backgroundTintList = ColorStateList.valueOf(ACCENT)
             setOnClickListener { saveSettings() }
         }
         formContainer.addView(saveButton, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(52)).also { it.topMargin = dp(8) })
+
+        val testButton = MaterialButton(this).apply {
+            text = "Test AI reply now"
+            isAllCaps = false
+            textSize = 14f
+            cornerRadius = dp(16)
+            backgroundTintList = ColorStateList.valueOf(0x00000000)
+            setTextColor(ACCENT)
+            setOnClickListener { runTest() }
+        }
+        formContainer.addView(testButton, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)).also { it.topMargin = dp(4) })
+
+        testStatusText = TextView(this).apply {
+            textSize = 13f
+            setPadding(0, dp(4), 0, dp(16))
+            // Surface any error that happened silently during real Telegram use, so it's
+            // never invisible — this is the whole point of storing aiLastError.
+            secureStore.aiLastError?.let { lastError ->
+                text = "Last live error (from an actual Telegram message): $lastError"
+                setTextColor(ERROR_RED)
+            }
+        }
+        formContainer.addView(testStatusText)
 
         val scroll = ScrollView(this).apply {
             addView(formContainer)
@@ -165,7 +252,7 @@ class AiSettingsActivity : AppCompatActivity() {
             setBoxCornerRadii(dp(14).toFloat(), dp(14).toFloat(), dp(14).toFloat(), dp(14).toFloat())
             boxStrokeWidth = 0
             boxStrokeWidthFocused = dp(1)
-            setBoxStrokeColorStateList(android.content.res.ColorStateList.valueOf(ACCENT))
+            setBoxStrokeColorStateList(ColorStateList.valueOf(ACCENT))
             layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 .also { it.topMargin = dp(10) }
         }
@@ -190,9 +277,60 @@ class AiSettingsActivity : AppCompatActivity() {
         return til to dropdown
     }
 
-    private fun saveSettings() {
+    private fun currentProviderKey(): String {
         val providerIndex = providers.indexOf(providerDropdown.text.toString()).coerceAtLeast(0)
-        val providerKey = providerKeys[providerIndex]
+        return providerKeys[providerIndex]
+    }
+
+    private fun defaultModelFor(provider: String): String = when (provider) {
+        "openai" -> "gpt-4.1-mini"
+        "gemini" -> "gemini-3.1-flash-lite"
+        "anthropic" -> "claude-haiku-4-5-20251001"
+        "openrouter" -> "openai/gpt-4.1-mini"
+        else -> "gpt-4.1-mini"
+    }
+
+    /** Builds a config straight from whatever is currently typed in the form —
+     *  lets the user test before saving, and see the EXACT error if it fails. */
+    private fun runTest() {
+        val providerKey = currentProviderKey()
+        val apiKey = apiKeyInput.text.toString().trim()
+        if (apiKey.isEmpty()) {
+            testStatusText.setTextColor(ERROR_RED)
+            testStatusText.text = "Enter an API key first"
+            return
+        }
+
+        testStatusText.setTextColor(TEXT_SECONDARY)
+        testStatusText.text = "Testing…"
+
+        val config = AiConfig(
+            provider = providerKey,
+            apiKey = apiKey,
+            baseUrl = baseUrlInput.text.toString().trim().ifEmpty { null },
+            model = modelInput.text.toString().trim().ifEmpty { defaultModelFor(providerKey) },
+            temperature = tempInput.text.toString().toFloatOrNull()?.coerceIn(0f, 1f) ?: 0.7f,
+            maxTokens = maxTokensInput.text.toString().toIntOrNull()?.coerceIn(50, 4000) ?: 512,
+            systemPrompt = systemPromptInput.text.toString().trim().ifEmpty { "You are a friendly, helpful assistant." }
+        )
+
+        lifecycleScope.launch {
+            val result = aiProvider.getReply("Say hello in one short sentence.", config)
+            result.fold(
+                onSuccess = { reply ->
+                    testStatusText.setTextColor(SUCCESS_GREEN)
+                    testStatusText.text = "✓ It works! Sample reply: \"$reply\""
+                },
+                onFailure = { e ->
+                    testStatusText.setTextColor(ERROR_RED)
+                    testStatusText.text = "✗ Failed: ${e.message ?: e.toString()}"
+                }
+            )
+        }
+    }
+
+    private fun saveSettings() {
+        val providerKey = currentProviderKey()
 
         if (aiSwitch.isChecked && apiKeyInput.text.toString().trim().isEmpty()) {
             Toast.makeText(this, "Enter an API key to enable AI, or turn AI off", Toast.LENGTH_SHORT).show()
@@ -203,6 +341,7 @@ class AiSettingsActivity : AppCompatActivity() {
         val maxTokens = maxTokensInput.text.toString().toIntOrNull()?.coerceIn(50, 4000) ?: 512
 
         secureStore.aiEnabled = aiSwitch.isChecked
+        secureStore.aiMode = selectedMode
         secureStore.aiProvider = providerKey
         secureStore.aiApiKey = apiKeyInput.text.toString().trim()
         secureStore.aiBaseUrl = baseUrlInput.text.toString().trim().ifEmpty { null }
@@ -210,6 +349,7 @@ class AiSettingsActivity : AppCompatActivity() {
         secureStore.aiTemperature = temp
         secureStore.aiMaxTokens = maxTokens
         secureStore.aiSystemPrompt = systemPromptInput.text.toString().trim().ifEmpty { "You are a friendly, helpful assistant." }
+        secureStore.aiLastError = null
 
         Toast.makeText(this, "AI settings saved", Toast.LENGTH_SHORT).show()
         finish()

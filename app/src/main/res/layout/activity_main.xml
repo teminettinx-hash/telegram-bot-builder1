@@ -1,258 +1,491 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient"
-    android:fillViewport="true">
+    android:orientation="vertical"
+    android:background="@color/md_background">
 
+    <!-- Top app bar -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="22dp">
+        android:layout_height="@dimen/top_bar_height"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/md_surface_container_lowest"
+        android:elevation="2dp"
+        android:paddingHorizontal="@dimen/margin_mobile">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_smart_toy"
+            app:tint="@color/md_primary"
+            android:contentDescription="@null" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/space_sm"
             android:text="Bot Builder"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.01"
-            android:textColor="@color/text_primary"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="2dp" />
+            android:textSize="20sp"
+            android:fontFamily="@font/inter_semibold"
+            android:textColor="@color/md_on_surface" />
 
         <TextView
+            android:id="@+id/textTopBarLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Set up your bot in a minute"
+            android:layout_marginEnd="@dimen/space_sm"
+            android:text="Dashboard"
             android:textSize="14sp"
-            android:textColor="@color/text_secondary"
-            android:layout_marginBottom="28dp" />
+            android:fontFamily="@font/inter_medium"
+            android:textColor="@color/md_on_surface_variant" />
 
-        <!-- Bot Identity glass card (no token ever shown here — Settings only) -->
+        <ImageView
+            android:id="@+id/imageAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="8dp"
+            android:background="@drawable/bg_circle_primary"
+            android:src="@drawable/ic_person"
+            app:tint="@color/md_on_primary"
+            android:contentDescription="@null" />
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/bg_glass_card"
-            android:padding="22dp"
-            android:layout_marginBottom="18dp"
-            android:elevation="2dp">
+            android:padding="@dimen/margin_mobile">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Your Bot"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="10dp" />
-
-            <TextView
-                android:id="@+id/textStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Not connected"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="14dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonSettings"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:text="Settings — connect / manage token"
-                android:textAllCaps="false"
-                android:textSize="15sp"
-                app:cornerRadius="18dp"
-                app:backgroundTint="@color/accent" />
-
-        </LinearLayout>
-
-        <!-- Dashboard glass card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_glass_card"
-            android:padding="22dp"
-            android:layout_marginBottom="18dp"
-            android:elevation="2dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Overview"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="14dp" />
-
+            <!-- Bot status card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_lowest"
+                android:elevation="1dp"
+                android:padding="@dimen/space_lg"
+                android:layout_marginBottom="@dimen/space_lg">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                    <TextView
-                        android:id="@+id/textRuleCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/accent_dark" />
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:padding="14dp"
+                        android:background="@drawable/bg_circle_secondary_container"
+                        android:src="@drawable/ic_smart_toy"
+                        app:tint="@color/md_primary"
+                        android:contentDescription="@null" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Auto-replies"
-                        android:textSize="12sp"
-                        android:textColor="@color/text_secondary" />
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/space_md"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:id="@+id/textBotUsername"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Your Bot"
+                                android:textSize="19sp"
+                                android:fontFamily="@font/inter_semibold"
+                                android:textColor="@color/md_on_surface" />
+
+                            <ImageButton
+                                android:id="@+id/buttonSettings"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:padding="3dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:src="@drawable/ic_settings"
+                                app:tint="@color/md_on_surface_variant"
+                                android:contentDescription="Settings" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="4dp">
+
+                            <View
+                                android:layout_width="8dp"
+                                android:layout_height="8dp"
+                                android:background="@drawable/bg_dot_online" />
+
+                            <TextView
+                                android:id="@+id/textStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="Not connected"
+                                android:textSize="13sp"
+                                android:fontFamily="@font/inter"
+                                android:textColor="@color/md_on_surface_variant" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/space_md">
 
-                    <TextView
-                        android:id="@+id/textAiStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="OFF"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/accent_dark" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonStopBot"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="@dimen/space_sm"
+                        android:text="Stop Bot"
+                        android:textAllCaps="false"
+                        android:fontFamily="@font/inter_medium"
+                        android:textSize="14sp"
+                        app:cornerRadius="@dimen/radius_xl"
+                        app:backgroundTint="@color/md_primary"
+                        android:textColor="@color/md_on_primary"
+                        app:icon="@drawable/ic_stop_circle"
+                        app:iconTint="@color/md_on_primary"
+                        app:iconGravity="textStart" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="AI mode"
-                        android:textSize="12sp"
-                        android:textColor="@color/text_secondary" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonStartBot"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/space_sm"
+                        android:text="Start Bot"
+                        android:textAllCaps="false"
+                        android:fontFamily="@font/inter_medium"
+                        android:textSize="14sp"
+                        app:cornerRadius="@dimen/radius_xl"
+                        app:backgroundTint="@color/md_surface_variant"
+                        android:textColor="@color/md_on_surface_variant"
+                        app:icon="@drawable/ic_play_circle"
+                        app:iconTint="@color/md_on_surface_variant"
+                        app:iconGravity="textStart" />
                 </LinearLayout>
-
             </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonManageReplies"
+            <!-- Quick stat chips -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Manage Auto Replies"
-                android:textAllCaps="false"
-                android:textSize="14sp"
-                app:cornerRadius="16dp"
-                app:backgroundTint="#00000000"
-                android:textColor="@color/accent_dark"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_marginTop="8dp" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/space_lg">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonFileLinks"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="File Delivery Links"
-                android:textAllCaps="false"
-                android:textSize="14sp"
-                app:cornerRadius="16dp"
-                app:backgroundTint="#00000000"
-                android:textColor="@color/accent_dark"
-                style="@style/Widget.Material3.Button.TextButton" />
+                <TextView
+                    android:id="@+id/textReplyCountChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_chip_secondary"
+                    android:paddingHorizontal="@dimen/space_md"
+                    android:paddingVertical="@dimen/space_sm"
+                    android:drawableStart="@drawable/ic_rule"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="@color/md_on_secondary_container"
+                    android:text="0 Auto-reply rules"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/inter_medium"
+                    android:textColor="@color/md_on_secondary_container"
+                    android:layout_marginEnd="@dimen/space_sm" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonAiSettings"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="AI Settings"
-                android:textAllCaps="false"
-                android:textSize="14sp"
-                app:cornerRadius="16dp"
-                app:backgroundTint="#00000000"
-                android:textColor="@color/accent_dark"
-                style="@style/Widget.Material3.Button.TextButton" />
+                <TextView
+                    android:id="@+id/textAiStatusChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_chip_tertiary"
+                    android:paddingHorizontal="@dimen/space_md"
+                    android:paddingVertical="@dimen/space_sm"
+                    android:drawableStart="@drawable/ic_auto_awesome"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="@color/md_on_tertiary_fixed"
+                    android:text="AI Replies: OFF"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/inter_medium"
+                    android:textColor="@color/md_on_tertiary_fixed" />
+            </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonBotCommands"
+            <!-- Nav grid row 1 -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Bot Commands (/ menu)"
-                android:textAllCaps="false"
-                android:textSize="14sp"
-                app:cornerRadius="16dp"
-                app:backgroundTint="#00000000"
-                android:textColor="@color/accent_dark"
-                style="@style/Widget.Material3.Button.TextButton" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/space_sm">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonBroadcast"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Broadcast"
-                android:textAllCaps="false"
-                android:textSize="14sp"
-                app:cornerRadius="16dp"
-                app:backgroundTint="#00000000"
-                android:textColor="@color/accent_dark"
-                style="@style/Widget.Material3.Button.TextButton" />
+                <LinearLayout
+                    android:id="@+id/buttonManageReplies"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/space_sm"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/bg_card_lowest"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="@dimen/space_md">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonPlans"
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_icon_container_primary"
+                        android:src="@drawable/ic_forum"
+                        app:tint="@color/md_primary"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_sm"
+                        android:text="Auto Replies"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/inter_medium"
+                        android:textColor="@color/md_on_surface" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/buttonBotCommands"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/space_sm"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/bg_card_lowest"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="@dimen/space_md">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_icon_container_secondary"
+                        android:src="@drawable/ic_terminal"
+                        app:tint="@color/md_secondary"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_sm"
+                        android:text="Bot Commands"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/inter_medium"
+                        android:textColor="@color/md_on_surface" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Nav grid row 2 -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Plans &amp; Usage"
-                android:textAllCaps="false"
-                android:textSize="14sp"
-                app:cornerRadius="16dp"
-                app:backgroundTint="#00000000"
-                android:textColor="@color/accent_dark"
-                style="@style/Widget.Material3.Button.TextButton" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/space_sm">
+
+                <LinearLayout
+                    android:id="@+id/buttonFileLinks"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/space_sm"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/bg_card_lowest"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="@dimen/space_md">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_icon_container_tertiary"
+                        android:src="@drawable/ic_link"
+                        app:tint="@color/md_tertiary"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_sm"
+                        android:text="File Links"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/inter_medium"
+                        android:textColor="@color/md_on_surface" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/buttonAiSettings"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/space_sm"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/bg_card_lowest"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="@dimen/space_md">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_icon_container_primary"
+                        android:src="@drawable/ic_psychology"
+                        app:tint="@color/md_primary"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_sm"
+                        android:text="AI Settings"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/inter_medium"
+                        android:textColor="@color/md_on_surface" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Nav grid row 3 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/space_lg">
+
+                <LinearLayout
+                    android:id="@+id/buttonBroadcast"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/space_sm"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/bg_card_lowest"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="@dimen/space_md">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_icon_container_secondary"
+                        android:src="@drawable/ic_campaign"
+                        app:tint="@color/md_secondary"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_sm"
+                        android:text="Broadcast"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/inter_medium"
+                        android:textColor="@color/md_on_surface" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/buttonPlans"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/space_sm"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/bg_card_lowest"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="@dimen/space_md">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_icon_container_tertiary"
+                        android:src="@drawable/ic_analytics"
+                        app:tint="@color/md_tertiary"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_sm"
+                        android:text="Plans &amp; Usage"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/inter_medium"
+                        android:textColor="@color/md_on_surface" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Footer -->
+            <View
+                android:layout_width="80dp"
+                android:layout_height="1dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/md_outline_variant"
+                android:layout_marginTop="@dimen/space_md" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_sm"
+                android:layout_marginBottom="@dimen/space_xl"
+                android:gravity="center"
+                android:text="&quot;Your bot is working hard while you relax.&quot;"
+                android:textStyle="italic"
+                android:textSize="13sp"
+                android:fontFamily="@font/inter"
+                android:textColor="@color/md_on_surface_variant" />
 
         </LinearLayout>
+    </ScrollView>
 
-        <!-- Controls -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_nav_height"
+        android:background="@color/md_surface_container_lowest"
+        android:elevation="8dp"
+        app:itemIconTint="@color/bottom_nav_item_color"
+        app:itemTextColor="@color/bottom_nav_item_color"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonStartBot"
-                android:layout_width="0dp"
-                android:layout_height="52dp"
-                android:layout_weight="1"
-                android:text="Start"
-                android:textAllCaps="false"
-                android:textSize="15sp"
-                app:cornerRadius="18dp"
-                app:backgroundTint="@color/accent"
-                android:layout_marginEnd="8dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonStopBot"
-                android:layout_width="0dp"
-                android:layout_height="52dp"
-                android:layout_weight="1"
-                android:text="Stop"
-                android:textAllCaps="false"
-                android:textSize="15sp"
-                app:cornerRadius="18dp"
-                app:strokeColor="@color/accent"
-                app:strokeWidth="1.5dp"
-                android:textColor="@color/accent_dark"
-                app:backgroundTint="#00000000"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_marginStart="8dp" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

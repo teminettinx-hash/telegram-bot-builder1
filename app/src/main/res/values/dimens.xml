@@ -1,0 +1,17 @@
+<resources>
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_base">8dp</dimen>
+    <dimen name="space_sm">12dp</dimen>
+    <dimen name="space_md">16dp</dimen>
+    <dimen name="space_lg">24dp</dimen>
+    <dimen name="space_xl">32dp</dimen>
+    <dimen name="margin_mobile">16dp</dimen>
+
+    <dimen name="radius_sm">8dp</dimen>
+    <dimen name="radius_default">12dp</dimen>
+    <dimen name="radius_lg">16dp</dimen>
+    <dimen name="radius_xl">24dp</dimen>
+
+    <dimen name="top_bar_height">64dp</dimen>
+    <dimen name="bottom_nav_height">64dp</dimen>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="Dashboard" />
+    <item
+        android:id="@+id/nav_replies"
+        android:icon="@drawable/ic_forum"
+        android:title="Replies" />
+    <item
+        android:id="@+id/nav_ai"
+        android:icon="@drawable/ic_smart_toy"
+        android:title="AI" />
+    <item
+        android:id="@+id/nav_more"
+        android:icon="@drawable/ic_more_horiz"
+        android:title="More" />
+</menu>

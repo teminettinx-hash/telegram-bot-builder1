@@ -7,6 +7,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 data class AiConfig(
@@ -35,17 +37,19 @@ private val gson = Gson()
 class AiProviderRouter : AiProvider {
 
     override suspend fun getReply(userMessage: String, config: AiConfig): Result<String> {
-        return try {
-            when (config.provider.lowercase()) {
-                "openai" -> openAiCompatible(userMessage, config, "https://api.openai.com/v1/chat/completions")
-                "openrouter" -> openAiCompatible(userMessage, config, "https://openrouter.ai/api/v1/chat/completions")
-                "custom" -> openAiCompatible(userMessage, config, config.baseUrl ?: return Result.failure(IllegalStateException("Custom base URL not set")))
-                "gemini" -> gemini(userMessage, config)
-                "anthropic" -> anthropic(userMessage, config)
-                else -> Result.failure(IllegalArgumentException("Unknown AI provider: ${config.provider}"))
+        return withContext(Dispatchers.IO) {
+            try {
+                when (config.provider.lowercase()) {
+                    "openai" -> openAiCompatible(userMessage, config, "https://api.openai.com/v1/chat/completions")
+                    "openrouter" -> openAiCompatible(userMessage, config, "https://openrouter.ai/api/v1/chat/completions")
+                    "custom" -> openAiCompatible(userMessage, config, config.baseUrl ?: return@withContext Result.failure(IllegalStateException("Custom base URL not set")))
+                    "gemini" -> gemini(userMessage, config)
+                    "anthropic" -> anthropic(userMessage, config)
+                    else -> Result.failure(IllegalArgumentException("Unknown AI provider: ${config.provider}"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
 

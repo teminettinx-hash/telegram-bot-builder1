@@ -141,22 +141,47 @@ class BotRepository(
     }
 
     /** Builds the AI system prompt by appending the user's saved reply rules as reference data,
-     *  so AI answers (e.g. prices) stay in sync with what the user already configured. */
+     *  so AI answers (e.g. prices) stay in sync with what the user already configured.
+     *  Behavior branches on Strict vs Free mode (set in AI Settings):
+     *   - FREE: can use general knowledge AND the reference info, whichever fits the question.
+     *   - STRICT: only allowed to use the reference info — no general-knowledge answers at all,
+     *     even though it still reasons over that reference info with full model capability. */
     private fun buildSystemPrompt(baseRules: List<ReplyRule>): String {
-        val base = secureStore.aiSystemPrompt ?: "You are a helpful assistant."
-        if (baseRules.isEmpty()) return base
-
-        val reference = baseRules.joinToString("\n") { rule ->
-            "- ${rule.label}: ${rule.answer}"
+        val base = secureStore.aiSystemPrompt ?: "You are a friendly, helpful assistant."
+        val reference = if (baseRules.isEmpty()) {
+            "(No reference information has been saved yet — add Auto Replies to give this bot real answers.)"
+        } else {
+            baseRules.joinToString("\n") { rule -> "- ${rule.label}: ${rule.answer}" }
         }
-        return """
-            $base
 
-            Reference information — use this to answer accurately when relevant:
-            $reference
+        return if (secureStore.aiMode == "STRICT") {
+            """
+                $base
 
-            Only use the above when relevant. If the question isn't covered, answer naturally and helpfully.
-        """.trimIndent()
+                STRICT MODE — follow this exactly:
+                You may ONLY answer using the reference information below. You may reason about it,
+                combine facts from it, and phrase your answer naturally and helpfully — but you must
+                NOT use any general world knowledge that isn't in this reference information, even for
+                things that seem like common knowledge.
+
+                Reference information:
+                $reference
+
+                If the question cannot be answered from the reference information above, say plainly
+                that you can only help with questions covered by what you've been given, and don't
+                guess or fall back on outside knowledge.
+            """.trimIndent()
+        } else {
+            """
+                $base
+
+                Reference information — use this to answer accurately when relevant:
+                $reference
+
+                Only use the above when relevant. If the question isn't covered, answer naturally
+                and helpfully using your general knowledge.
+            """.trimIndent()
+        }
     }
 
     private suspend fun callAi(userMessage: String, rules: List<ReplyRule>): String? {
@@ -170,14 +195,19 @@ class BotRepository(
             maxTokens = secureStore.aiMaxTokens,
             systemPrompt = buildSystemPrompt(rules)
         )
-        return aiProvider.getReply(userMessage, config).getOrNull()
+        val result = aiProvider.getReply(userMessage, config)
+        result.fold(
+            onSuccess = { secureStore.aiLastError = null },
+            onFailure = { e -> secureStore.aiLastError = e.message ?: e.toString() }
+        )
+        return result.getOrNull()
     }
 
     private fun defaultModelFor(provider: String?): String = when (provider) {
-        "openai" -> "gpt-4o-mini"
-        "gemini" -> "gemini-1.5-flash"
-        "anthropic" -> "claude-3-5-haiku-20241022"
-        "openrouter" -> "openai/gpt-4o-mini"
-        else -> "gpt-4o-mini"
+        "openai" -> "gpt-4.1-mini"
+        "gemini" -> "gemini-3.1-flash-lite"
+        "anthropic" -> "claude-haiku-4-5-20251001"
+        "openrouter" -> "openai/gpt-4.1-mini"
+        else -> "gpt-4.1-mini"
     }
 }

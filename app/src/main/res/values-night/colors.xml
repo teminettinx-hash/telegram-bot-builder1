@@ -1,0 +1,55 @@
+<resources>
+    <!-- Legacy simple aliases (dark equivalents) -->
+    <color name="accent">#BCC2FF</color>
+    <color name="accent_dark">#8A92D4</color>
+    <color name="text_primary">#E4E1ED</color>
+    <color name="text_secondary">#C6C5D1</color>
+    <color name="glass_stroke">#40FFFFFF</color>
+
+    <!-- Full Material 3 token set — "Synthetic Night" dark theme (from Stitch DESIGN.md) -->
+    <color name="md_surface">#13131B</color>
+    <color name="md_surface_dim">#13131B</color>
+    <color name="md_surface_bright">#393841</color>
+    <color name="md_surface_container_lowest">#0D0D15</color>
+    <color name="md_surface_container_low">#1B1B23</color>
+    <color name="md_surface_container">#1F1F27</color>
+    <color name="md_surface_container_high">#292932</color>
+    <color name="md_surface_container_highest">#34343D</color>
+    <color name="md_on_surface">#E4E1ED</color>
+    <color name="md_on_surface_variant">#C6C5D1</color>
+    <color name="md_inverse_surface">#E4E1ED</color>
+    <color name="md_inverse_on_surface">#303038</color>
+    <color name="md_outline">#90909B</color>
+    <color name="md_outline_variant">#464650</color>
+    <color name="md_surface_tint">#BCC2FF</color>
+    <color name="md_primary">#BCC2FF</color>
+    <color name="md_on_primary">#222A66</color>
+    <color name="md_primary_container">#8A92D4</color>
+    <color name="md_on_primary_container">#212964</color>
+    <color name="md_inverse_primary">#515A97</color>
+    <color name="md_secondary">#44E2CD</color>
+    <color name="md_on_secondary">#003731</color>
+    <color name="md_secondary_container">#03C6B2</color>
+    <color name="md_on_secondary_container">#004D44</color>
+    <color name="md_tertiary">#FFAFD3</color>
+    <color name="md_on_tertiary">#620040</color>
+    <color name="md_tertiary_container">#EA6AAD</color>
+    <color name="md_on_tertiary_container">#60003F</color>
+    <color name="md_error">#FFB4AB</color>
+    <color name="md_on_error">#690005</color>
+    <color name="md_error_container">#93000A</color>
+    <color name="md_on_error_container">#FFDAD6</color>
+    <color name="md_tertiary_fixed">#FFD8E7</color>
+    <color name="md_on_tertiary_fixed">#3D0026</color>
+    <color name="md_background">#13131B</color>
+    <color name="md_on_background">#E4E1ED</color>
+    <color name="md_surface_variant">#34343D</color>
+
+    <!-- Brand accents (dark-adapted) -->
+    <color name="brand_primary">#BCC2FF</color>
+    <color name="brand_secondary_text">#C6C5D1</color>
+    <color name="status_online">#40FF5A</color>
+    <color name="primary_10pct">#1ABCC2FF</color>
+    <color name="secondary_10pct">#1A44E2CD</color>
+    <color name="tertiary_10pct">#1AFFAFD3</color>
+</resources>
