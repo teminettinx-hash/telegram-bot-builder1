@@ -13,8 +13,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.botbuilder.app.data.local.SecureStore
+import com.botbuilder.app.data.local.AppDatabase
 import com.botbuilder.app.data.remote.TelegramApi
+import com.botbuilder.app.data.supabase.CloudSyncManager
+import com.botbuilder.app.data.supabase.SupabaseAuthManager
 import com.botbuilder.app.service.BotPollingService
+import com.botbuilder.app.ui.auth.AuthActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -30,12 +34,17 @@ private const val DANGER = 0xFFD64545.toInt()
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var secureStore: SecureStore
+    private lateinit var authManager: SupabaseAuthManager
+    private lateinit var cloudSync: CloudSyncManager
     private lateinit var tokenInput: TextInputEditText
     private lateinit var statusText: TextView
+    private lateinit var syncStatusText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         secureStore = SecureStore(applicationContext)
+        authManager = SupabaseAuthManager(secureStore)
+        cloudSync = CloudSyncManager(AppDatabase.getInstance(applicationContext), secureStore)
 
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -96,6 +105,67 @@ class SettingsActivity : AppCompatActivity() {
             setOnClickListener { confirmDisconnect() }
         }
         formContainer.addView(disconnectButton, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)).also { it.topMargin = dp(4) })
+
+        // --- Account / Cloud Sync ---
+        val accountTitle = TextView(this).apply {
+            text = secureStore.supabaseUserName?.let { "Account — $it" } ?: (secureStore.supabaseUserEmail ?: "Account")
+            textSize = 16f
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(TEXT_PRIMARY)
+            setPadding(0, dp(28), 0, dp(4))
+        }
+        formContainer.addView(accountTitle)
+
+        val accountSubtitle = TextView(this).apply {
+            text = "Back up your replies, commands, and AI settings so they follow you to a new device."
+            textSize = 13f
+            setTextColor(TEXT_SECONDARY)
+            setPadding(0, 0, 0, dp(12))
+        }
+        formContainer.addView(accountSubtitle)
+
+        val syncRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val backupButton = MaterialButton(this).apply {
+            text = "Backup"
+            isAllCaps = false
+            textSize = 14f
+            cornerRadius = dp(14)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(ACCENT)
+            setOnClickListener { backupToCloud() }
+        }
+        val restoreButton = MaterialButton(this).apply {
+            text = "Restore"
+            isAllCaps = false
+            textSize = 14f
+            cornerRadius = dp(14)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(0x00000000)
+            strokeColor = android.content.res.ColorStateList.valueOf(ACCENT)
+            strokeWidth = dp(1)
+            setTextColor(ACCENT)
+            setOnClickListener { restoreFromCloud() }
+        }
+        syncRow.addView(backupButton, LinearLayout.LayoutParams(0, dp(44), 1f).also { it.marginEnd = dp(6) })
+        syncRow.addView(restoreButton, LinearLayout.LayoutParams(0, dp(44), 1f).also { it.marginStart = dp(6) })
+        formContainer.addView(syncRow)
+
+        syncStatusText = TextView(this).apply {
+            text = ""
+            textSize = 12f
+            setTextColor(TEXT_SECONDARY)
+            setPadding(0, dp(8), 0, dp(4))
+        }
+        formContainer.addView(syncStatusText)
+
+        val signOutButton = MaterialButton(this).apply {
+            text = "Sign out"
+            isAllCaps = false
+            textSize = 14f
+            cornerRadius = dp(16)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(0x00000000)
+            setTextColor(DANGER)
+            setOnClickListener { signOut() }
+        }
+        formContainer.addView(signOutButton, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)).also { it.topMargin = dp(4) })
 
         val scroll = ScrollView(this).apply { addView(formContainer) }
 
@@ -170,6 +240,28 @@ class SettingsActivity : AppCompatActivity() {
                 statusText.text = friendly
             }
         }
+    }
+
+    private fun backupToCloud() {
+        syncStatusText.text = "Backing up…"
+        lifecycleScope.launch {
+            val result = cloudSync.backupToCloud()
+            syncStatusText.text = if (result.isSuccess) "Backed up ✓" else "Backup failed: ${result.exceptionOrNull()?.message}"
+        }
+    }
+
+    private fun restoreFromCloud() {
+        syncStatusText.text = "Restoring…"
+        lifecycleScope.launch {
+            val result = cloudSync.restoreFromCloud()
+            syncStatusText.text = if (result.isSuccess) "Restored ✓" else "Restore failed: ${result.exceptionOrNull()?.message}"
+        }
+    }
+
+    private fun signOut() {
+        authManager.signOut()
+        startActivity(Intent(this, AuthActivity::class.java))
+        finish()
     }
 
     private fun confirmDisconnect() {

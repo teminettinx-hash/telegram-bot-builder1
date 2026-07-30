@@ -114,6 +114,37 @@ class SecureStore(context: Context) {
 
     fun clearBotToken() = prefs.edit().remove(KEY_BOT_TOKEN).apply()
 
+    // Supabase session — set after sign-in/sign-up, cleared on sign-out
+    var supabaseAccessToken: String?
+        get() = prefs.getString(KEY_SUPA_ACCESS_TOKEN, null)
+        set(value) = prefs.edit().putString(KEY_SUPA_ACCESS_TOKEN, value).apply()
+
+    var supabaseRefreshToken: String?
+        get() = prefs.getString(KEY_SUPA_REFRESH_TOKEN, null)
+        set(value) = prefs.edit().putString(KEY_SUPA_REFRESH_TOKEN, value).apply()
+
+    var supabaseUserId: String?
+        get() = prefs.getString(KEY_SUPA_USER_ID, null)
+        set(value) = prefs.edit().putString(KEY_SUPA_USER_ID, value).apply()
+
+    var supabaseUserEmail: String?
+        get() = prefs.getString(KEY_SUPA_USER_EMAIL, null)
+        set(value) = prefs.edit().putString(KEY_SUPA_USER_EMAIL, value).apply()
+
+    var supabaseUserName: String?
+        get() = prefs.getString(KEY_SUPA_USER_NAME, null)
+        set(value) = prefs.edit().putString(KEY_SUPA_USER_NAME, value).apply()
+
+    fun clearSupabaseSession() {
+        prefs.edit()
+            .remove(KEY_SUPA_ACCESS_TOKEN)
+            .remove(KEY_SUPA_REFRESH_TOKEN)
+            .remove(KEY_SUPA_USER_ID)
+            .remove(KEY_SUPA_USER_EMAIL)
+            .remove(KEY_SUPA_USER_NAME)
+            .apply()
+    }
+
     companion object {
         private const val KEY_BOT_TOKEN = "bot_token"
         private const val KEY_BOT_USERNAME = "bot_username"
@@ -132,5 +163,10 @@ class SecureStore(context: Context) {
         private const val KEY_MESSAGES_THIS_MONTH = "messages_this_month"
         private const val KEY_AI_REPLIES_THIS_MONTH = "ai_replies_this_month"
         private const val KEY_MESSAGE_LIMIT_NOTICE_SENT = "message_limit_notice_sent"
+        private const val KEY_SUPA_ACCESS_TOKEN = "supa_access_token"
+        private const val KEY_SUPA_REFRESH_TOKEN = "supa_refresh_token"
+        private const val KEY_SUPA_USER_ID = "supa_user_id"
+        private const val KEY_SUPA_USER_EMAIL = "supa_user_email"
+        private const val KEY_SUPA_USER_NAME = "supa_user_name"
     }
 }
