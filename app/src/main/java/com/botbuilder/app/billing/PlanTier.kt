@@ -32,7 +32,7 @@ object BillingConfig {
  *  anything else about the app — same features, same screens, just no caps while testing.
  *  Flip back to false before this build goes to anyone but you. */
 object TesterMode {
-    const val UNRESTRICTED = false
+    const val UNRESTRICTED = true
 }
 
 /** Numeric caps straight from the pricing table. "Bots connected" is intentionally
